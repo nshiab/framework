@@ -16,84 +16,26 @@ export default {
   root: "docs",
   output: "docs/.observablehq/dist",
   title: "Observable Framework",
+  pager: false,
   pages: [
-    {name: "What is Framework?", path: "/what-is-framework"},
-    {name: "Getting started", path: "/getting-started"},
-    {name: "Deploying", path: "/deploying"},
-    {name: "Embedding", path: "/embeds"},
+    {name: "Hi!", path: "/en/index"},
     {
-      name: "Reference",
-      open: false,
+      name: "Examples",
       pages: [
-        {name: "Project structure", path: "/project-structure"},
-        {name: "Markdown", path: "/markdown"},
-        {name: "JavaScript", path: "/javascript"},
-        {name: "Reactivity", path: "/reactivity"},
-        {name: "JSX", path: "/jsx"},
-        {name: "Imports", path: "/imports"},
-        {name: "Data loaders", path: "/data-loaders"},
-        {name: "Files", path: "/files"},
-        {name: "SQL", path: "/sql"},
-        {name: "Themes", path: "/themes"},
-        {name: "Page loaders", path: "/page-loaders"},
-        {name: "Parameterized routes", path: "/params"},
-        {name: "Configuration", path: "/config"}
+        {name: "Example 1", path: "/en/example-1"},
+        {name: "Example 2", path: "/en/example-2"},
+        {name: "Example 3", path: "/en/example-3"}
       ]
     },
+    {name: "Coucou!", path: "/fr/index"},
     {
-      name: "Inputs",
-      open: false,
-      pager: "inputs",
+      name: "Exemples",
       pages: [
-        {name: "Button", path: "/inputs/button"},
-        {name: "Checkbox", path: "/inputs/checkbox"},
-        {name: "Color", path: "/inputs/color"},
-        {name: "Date", path: "/inputs/date"},
-        {name: "File", path: "/inputs/file"},
-        {name: "Form", path: "/inputs/form"},
-        {name: "Radio", path: "/inputs/radio"},
-        {name: "Range", path: "/inputs/range"},
-        {name: "Search", path: "/inputs/search"},
-        {name: "Select", path: "/inputs/select"},
-        {name: "Table", path: "/inputs/table"},
-        {name: "Text", path: "/inputs/text"},
-        {name: "Textarea", path: "/inputs/textarea"},
-        {name: "Toggle", path: "/inputs/toggle"}
+        {name: "Exemple 1", path: "/fr/example-1"},
+        {name: "Exemple 2", path: "/fr/example-2"},
+        {name: "Exemple 3", path: "/fr/example-3"}
       ]
-    },
-    {
-      name: "Libraries",
-      open: false,
-      pager: false,
-      pages: [
-        {name: "Apache Arrow", path: "/lib/arrow"},
-        {name: "Arquero", path: "/lib/arquero"},
-        {name: "CSV", path: "/lib/csv"},
-        {name: "D3", path: "/lib/d3"},
-        {name: "Deck.gl", path: "/lib/deckgl"},
-        {name: "DOT (Graphviz)", path: "/lib/dot"},
-        {name: "DuckDB", path: "/lib/duckdb"},
-        {name: "Hypertext Literal", path: "/lib/htl"},
-        {name: "Leaflet", path: "/lib/leaflet"},
-        {name: "Lodash", path: "/lib/lodash"},
-        {name: "Mapbox GL JS", path: "/lib/mapbox-gl"},
-        {name: "Mermaid", path: "/lib/mermaid"},
-        {name: "Microsoft Excel (XLSX)", path: "/lib/xlsx"},
-        {name: "Mosaic vgplot", path: "/lib/mosaic"},
-        {name: "Observable Generators", path: "/lib/generators"},
-        {name: "Observable Inputs", path: "/lib/inputs"},
-        {name: "Observable Plot", path: "/lib/plot"},
-        {name: "Shapefile", path: "/lib/shapefile"},
-        {name: "SQLite", path: "/lib/sqlite"},
-        {name: "TeX", path: "/lib/tex"},
-        {name: "TopoJSON", path: "/lib/topojson"},
-        {name: "Vega-Lite", path: "/lib/vega-lite"},
-        {name: "ZIP", path: "/lib/zip"}
-      ]
-    },
-    {name: "Examples", path: "https://github.com/observablehq/framework/tree/main/examples"},
-    {name: "Converting notebooks", path: "/convert"},
-    {name: "Contributing", path: "/contributing", pager: false}
+    }
   ],
   dynamicPaths: [
     "/chart.js",
@@ -150,9 +92,51 @@ export default {
       )} GitHub stars" href="https://github.com/observablehq/framework"><span>GitHub️ ${
         stargazers_count ? formatPrefix(".1s", 1000)(stargazers_count) : ""
       }</span></a>
+    <select id="select-language">
+      <option>en</option> 
+      <option>fr</option>
+    </select>
     </span>
-  </div>`,
-  footer: `© ${new Date().getUTCFullYear()} Observable, Inc.`,
+  </div>
+    `,
+  footer: ({path}) =>
+    `<div>© ${new Date().getUTCFullYear()} Observable, Inc.</div>
+    <script>
+
+      // Retrieve the current language from the path
+      const lang = "${path.split("/")[1]}"
+
+      // Set the language select to the current language
+      const selectLanguage = document.getElementById("select-language");
+      selectLanguage.value = lang;
+
+      // If the user selects a new language, we modify the path and redirect
+      selectLanguage.addEventListener("change", (event) => {
+        window.location.href = "/" + event.target.value + "/" + "${path.split("/").slice(2).join("/")}"
+      });
+
+      // Retrieve all languages from the select
+      const allLangs = Array.from(selectLanguage.options).map(option => option.value);
+
+      // Remove links from the sidebar that are not pointing to the current language
+      for (const l of allLangs) {
+        document.querySelectorAll('#observablehq-sidebar ol .observablehq-link').forEach(link => {
+          if (link.querySelector("a").getAttribute('href').includes('/' + l + '/')) {
+            link.remove();
+          }
+        });
+      }
+
+      // We remove empty sections
+      document.querySelectorAll('section').forEach(section => {
+        if (!section.querySelector('ol') || !section.querySelector('ol').children.length) {
+          section.remove();
+        }
+      });
+
+      
+
+    </script>`,
   style: "style.css",
   search: {
     async *index() {

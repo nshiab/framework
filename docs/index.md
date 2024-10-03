@@ -1,4 +1,8 @@
----
+```js
+window.location.href = "/en/";
+```
+
+<!-- ---
 index: false
 ---
 
@@ -145,4 +149,4 @@ You write simple [Markdown](./markdown) pages — with interactive charts and i
 
 Framework includes thoughtfully-designed [themes](./themes), [grids](./markdown#grids), and [libraries](./imports) to help you build displays of data that look great on any device, including [Observable Plot](./lib/plot), [D3](./lib/d3), [Mosaic](./lib/mosaic), [Vega-Lite](./lib/vega-lite), [Graphviz](./lib/dot), [Mermaid](./lib/mermaid), [Leaflet](./lib/leaflet), [KaTeX](./lib/tex), and myriad more. And for working with data in the client, there’s [DuckDB](./lib/duckdb), [Arquero](./lib/arquero), [SQLite](./lib/sqlite), and more, too.
 
-Want the best dashboards? [Get started now.](./getting-started)
+Want the best dashboards? [Get started now.](./getting-started) -->
