@@ -18,6 +18,7 @@ export default {
   title: "Observable Framework",
   pager: false,
   pages: [
+    // ENGLISH
     {name: "Hi!", path: "/en/index"},
     {
       name: "Examples",
@@ -27,6 +28,7 @@ export default {
         {name: "Example 3", path: "/en/example-3"}
       ]
     },
+    // FRENCH
     {name: "Coucou!", path: "/fr/index"},
     {
       name: "Exemples",
@@ -115,8 +117,8 @@ export default {
         window.location.href = "/" + event.target.value + "/" + "${path.split("/").slice(2).join("/")}"
       });
 
-      // Retrieve all languages from the select
-      const allLangs = Array.from(selectLanguage.options).map(option => option.value);
+      // Retrieve all languages from the select, except the current one
+      const allLangs = Array.from(selectLanguage.options).map(option => option.value).filter(d => d !== lang);
 
       // Remove links from the sidebar that are not pointing to the current language
       for (const l of allLangs) {
@@ -133,9 +135,6 @@ export default {
           section.remove();
         }
       });
-
-      
-
     </script>`,
   style: "style.css",
   search: {
