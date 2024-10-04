@@ -1,6 +1,6 @@
 import mime from "mime";
 import type {Config, Page, Section} from "./config.js";
-import {mergeToc} from "./config.js";
+import {mergeToc, normalizePages} from "./config.js";
 import {enoent} from "./error.js";
 import {getClientPath} from "./files.js";
 import type {Html, HtmlResolvers} from "./html.js";
@@ -133,6 +133,8 @@ function registerFile(
 
 async function renderSidebar(options: RenderOptions, {resolveImport, resolveLink}: Resolvers): Promise<Html> {
   const {home, pages, root, path, search} = options;
+  const pagesArray = typeof pages === "function" ? normalizePages(pages(path)) : pages;
+
   return html`<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
 <label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
 <nav id="observablehq-sidebar">
@@ -149,7 +151,7 @@ async function renderSidebar(options: RenderOptions, {resolveImport, resolveLink
     (await rollupClient(getClientPath("search-init.js"), root, path, {resolveImport, minify: true})).trim()
   )}}</script>`
       : ""
-  }${pages.map((p, i) =>
+  }${pagesArray.map((p, i) =>
     "pages" in p
       ? html`\n  <${p.collapsible ? (p.open || isSectionActive(p, path) ? "details open" : "details") : "section"}${
           isSectionActive(p, path) ? html` class="observablehq-section-active"` : ""
@@ -160,8 +162,8 @@ async function renderSidebar(options: RenderOptions, {resolveImport, resolveLink
   </${p.collapsible ? "details" : "section"}>`
       : "pages" in p
       ? ""
-      : html`${i === 0 || "pages" in pages[i - 1] ? html`\n  <ol>` : ""}${renderListItem(p, path, resolveLink)}${
-          i === pages.length - 1 || "pages" in pages[i + 1] ? html`\n  </ol>` : ""
+      : html`${i === 0 || "pages" in pagesArray[i - 1] ? html`\n  <ol>` : ""}${renderListItem(p, path, resolveLink)}${
+          i === pagesArray.length - 1 || "pages" in pagesArray[i + 1] ? html`\n  </ol>` : ""
         }`
   )}
 </nav>

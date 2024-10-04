@@ -61,6 +61,8 @@ export type PageFragmentFunction = ({
   path: string;
 }) => string | null;
 
+export type SidebarPagesFunction = (path?: string) => (Page | Section<Page>)[];
+
 export interface SearchResult {
   path: string;
   title: string | null;
@@ -83,7 +85,7 @@ export interface Config {
   home: string; // defaults to the (escaped) title, or "Home"
   title?: string;
   sidebar: boolean; // defaults to true if pages isn’t empty
-  pages: (Page | Section<Page>)[];
+  pages: SidebarPagesFunction | (Page | Section<Page>)[];
   pager: boolean; // defaults to true
   paths: () => AsyncIterable<string>; // defaults to static Markdown files
   scripts: Script[]; // deprecated; defaults to empty array
@@ -248,7 +250,12 @@ export function normalizeConfig(spec: ConfigSpec = {}, defaultRoot?: string, wat
   });
   const title = spec.title === undefined ? undefined : String(spec.title);
   const home = spec.home === undefined ? he.escape(title ?? "Home") : String(spec.home); // eslint-disable-line import/no-named-as-default-member
-  const pages = spec.pages === undefined ? undefined : normalizePages(spec.pages);
+  const pages: SidebarPagesFunction | (Page | Section)[] | undefined =
+    spec.pages === undefined
+      ? undefined
+      : typeof spec.pages === "function"
+      ? (spec.pages as SidebarPagesFunction)
+      : normalizePages(spec.pages);
   const pager = spec.pager === undefined ? true : Boolean(spec.pager);
   const dynamicPaths = normalizeDynamicPaths(spec.dynamicPaths);
   const toc = normalizeToc(spec.toc as any);
@@ -313,7 +320,10 @@ export function normalizeConfig(spec: ConfigSpec = {}, defaultRoot?: string, wat
     watchPath
   };
   if (pages === undefined) Object.defineProperty(config, "pages", {get: () => readPages(root, md)});
-  if (sidebar === undefined) Object.defineProperty(config, "sidebar", {get: () => config.pages.length > 0});
+  if (sidebar === undefined)
+    Object.defineProperty(config, "sidebar", {
+      get: () => typeof config.pages === "function" || config.pages.length > 0
+    });
   configCache.set(spec, config);
   return config;
 }
@@ -404,7 +414,7 @@ function normalizeScript(spec: unknown): Script {
   return {src, async, type};
 }
 
-function normalizePages(spec: unknown): Config["pages"] {
+export function normalizePages(spec: unknown): (Page | Section<Page>)[] {
   return normalizeArray(spec, (spec: any) =>
     "pages" in spec ? normalizeSection(spec, normalizePage) : normalizePage(spec)
   );

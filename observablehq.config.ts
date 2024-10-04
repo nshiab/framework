@@ -16,30 +16,46 @@ export default {
   root: "docs",
   output: "docs/.observablehq/dist",
   title: "Observable Framework",
-  pages: [
-    // ENGLISH
-    {name: "Hi!", path: "/en/index", pager: "en"},
-    {
-      name: "Examples",
-      pager: "en",
-      pages: [
-        {name: "Example 1", path: "/en/example-1"},
-        {name: "Example 2", path: "/en/example-2"},
-        {name: "Example 3", path: "/en/example-3"}
-      ]
-    },
-    // FRENCH
-    {name: "Coucou!", path: "/fr/index", pager: "fr"},
-    {
-      name: "Exemples",
-      pager: "fr",
-      pages: [
-        {name: "Exemple 1", path: "/fr/example-1"},
-        {name: "Exemple 2", path: "/fr/example-2"},
-        {name: "Exemple 3", path: "/fr/example-3"}
-      ]
-    }
-  ],
+  pages: (path?: string) => {
+    const pagesArray = [
+      // ENGLISH
+      {name: "Hi!", path: "/en/index", pager: "en"},
+      {
+        name: "Examples",
+        pager: "en",
+        pages: [
+          {name: "Example 1", path: "/en/example-1"},
+          {name: "Example 2", path: "/en/example-2"},
+          {name: "Example 3", path: "/en/example-3"}
+        ]
+      },
+      // FRENCH
+      {name: "Coucou!", path: "/fr/index", pager: "fr"},
+      {
+        name: "Exemples",
+        pager: "fr",
+        pages: [
+          {name: "Exemple 1", path: "/fr/example-1"},
+          {name: "Exemple 2", path: "/fr/example-2"},
+          {name: "Exemple 3", path: "/fr/example-3"}
+        ]
+      }
+    ];
+
+    console.log("path", path);
+
+    if (path === undefined) return pagesArray;
+
+    const lang = path.slice(0, 4);
+
+    return pagesArray.filter((d) => {
+      if (typeof d.path === "string") {
+        return d.path.startsWith(lang);
+      } else if (Array.isArray(d.pages)) {
+        return d.pages[0].path.startsWith(lang);
+      }
+    });
+  },
   dynamicPaths: [
     "/chart.js",
     "/theme/dark",
@@ -116,25 +132,6 @@ export default {
       // If the user selects a new language, we modify the path and redirect
       selectLanguage.addEventListener("change", (event) => {
         window.location.href = "/" + event.target.value + "/" + "${path.split("/").slice(2).join("/")}"
-      });
-
-      // Retrieve all languages from the select, except the current one
-      const allLangs = Array.from(selectLanguage.options).map(option => option.value).filter(d => d !== lang);
-
-      // Remove links from the sidebar that are not pointing to the current language
-      for (const l of allLangs) {
-        document.querySelectorAll('#observablehq-sidebar ol .observablehq-link').forEach(link => {
-          if (link.querySelector("a").getAttribute('href').includes('/' + l + '/')) {
-            link.remove();
-          }
-        });
-      }
-
-      // We remove empty sections
-      document.querySelectorAll('section').forEach(section => {
-        if (!section.querySelector('ol') || !section.querySelector('ol').children.length) {
-          section.remove();
-        }
       });
     </script>`,
   style: "style.css",

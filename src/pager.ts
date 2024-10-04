@@ -1,4 +1,5 @@
 import type {Config, Page} from "./config.js";
+import {normalizePages} from "./config.js";
 
 export type PageLink =
   | {prev: undefined; next: Page} // first page
@@ -14,7 +15,9 @@ export function normalizePath(path: string): string {
 
 export function findLink(path: string, config: Config): PageLink | undefined {
   const {pages} = config;
-  let links = linkCache.get(pages);
+  const pagesArray = typeof pages === "function" ? normalizePages(pages()) : pages;
+
+  let links = linkCache.get(pagesArray);
   if (!links) {
     links = new Map<string, PageLink>();
     for (const pageGroup of walk(config)) {
@@ -35,7 +38,7 @@ export function findLink(path: string, config: Config): PageLink | undefined {
       }
     }
     if (links.size === 1) links.clear(); // no links if only one page
-    linkCache.set(pages, links);
+    linkCache.set(pagesArray, links);
   }
   return links.get(path);
 }
@@ -46,6 +49,7 @@ export function findLink(path: string, config: Config): PageLink | undefined {
  */
 function walk(config: Config): Iterable<Iterable<Page>> {
   const {pages, loaders, title = "Home"} = config;
+  const pagesArray = typeof pages === "function" ? normalizePages(pages()) : pages;
   const pageGroups = new Map<string, Page[]>();
   const visited = new Set<string>();
 
@@ -59,7 +63,7 @@ function walk(config: Config): Iterable<Iterable<Page>> {
 
   if (loaders.findPage("/index")) visit({name: title, path: "/index", pager: "main"});
 
-  for (const page of pages) {
+  for (const page of pagesArray) {
     if (page.path !== null) visit(page as Page);
     if ("pages" in page) for (const p of page.pages) visit(p);
   }
