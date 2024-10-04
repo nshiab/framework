@@ -16,12 +16,12 @@ export default {
   root: "docs",
   output: "docs/.observablehq/dist",
   title: "Observable Framework",
-  pager: false,
   pages: [
     // ENGLISH
-    {name: "Hi!", path: "/en/index"},
+    {name: "Hi!", path: "/en/index", pager: "en"},
     {
       name: "Examples",
+      pager: "en",
       pages: [
         {name: "Example 1", path: "/en/example-1"},
         {name: "Example 2", path: "/en/example-2"},
@@ -29,9 +29,10 @@ export default {
       ]
     },
     // FRENCH
-    {name: "Coucou!", path: "/fr/index"},
+    {name: "Coucou!", path: "/fr/index", pager: "fr"},
     {
       name: "Exemples",
+      pager: "fr",
       pages: [
         {name: "Exemple 1", path: "/fr/example-1"},
         {name: "Exemple 2", path: "/fr/example-2"},
